@@ -22,16 +22,17 @@ void batchWriteBegin();
 void batchWriteEnd();
 void set(int bitnum, bool value);
 void setAll(bool value);
-void selectorLed();
+void selectorLed(int bpm);
 
 //MULTIPLEXERS
 void muxSetup(int analogDataPin, int digitalDataPin, unsigned int dbt);
 void update();
-int get(byte pin);
+byte get(byte index);
 void debug();
 
 private:
 //LED SHIFT REGISTER
+
 int dataPin;
 int clockPin;
 int latchPin;
@@ -42,10 +43,16 @@ byte dataModes[16];
 byte readBuffer[16];
 bool batchWriteMode;
 bool batchReadMode;
-unsigned int selectorValue = 0;
+byte selectorValue = 0;
+byte _selectorValue;
+const unsigned int intervalSelector = 1000;
+elapsedMillis clockSelector;
+elapsedMillis clockBPM;
 void writeAllBits();
 void writeBitHard(int bitnum, bool value);
 void writeBitSoft(int bitnum, bool value);
+void displayPreset();
+void displayBPM(int bpm);
 
 //MULTIPLEXERS
 int _analogDataPin;
@@ -55,24 +62,28 @@ int S1 = 4;
 int S2 = 3;
 int S3 = 2;
 const int maxInputs = 8;
-byte pin;
+byte index;
 int minValue = 0;
 int maxValue = 1010;
 unsigned int _dbt; // Deadband threshold
-unsigned int potentiometers[8] = {0};
-unsigned int potentiometersTemp[8] = {0};// For smoothing purposes
-unsigned int potentiometersBuffer[8] = {0};// For smoothing purposes
+byte potentiometers[8] = {0};
+byte potentiometersTemp[8] = {0};// For smoothing purposes
+byte potentiometersBuffer[8] = {0};// For smoothing purposes
 elapsedMicros clockInputs;
 const unsigned int intervalInputs = 100;
 
 elapsedMicros clockDebounce;
 unsigned long lastDebounce = 0;
 const unsigned long debounceDelay = 300;
-bool buttonState[8] {LOW};
-bool buttonStateTemp[8] {LOW};
-bool buttonStateLast[8] {LOW};
-unsigned int toggles[3] {0};
+byte buttonState[8] {LOW};
+byte buttonStateTemp[8] {LOW};
+byte buttonStateLast[8] {LOW};
+byte toggles[3] {0};
 elapsedMillis clockDebug;
+
+//get array
+byte inputValues[10] {0}; // 7 potentiometers + 3 switches
+void makeArray();
 
 void readAnalog(byte i);
 void readDigital(byte i);

@@ -110,8 +110,19 @@ void OgamiHardware::writeAllBits() {
 	digitalWrite(latchPin, HIGH);
 }
 
-void OgamiHardware::selectorLed(){
+void OgamiHardware::selectorLed(int bpm){
+	if (clockSelector > intervalSelector) {
+		_selectorValue = selectorValue;
+		displayBPM(bpm);
+	}
+	if (_selectorValue != selectorValue) {
+		clockSelector = 0;
+		displayPreset();
+	}
+}
 
+
+void OgamiHardware::displayPreset(){
 	switch (selectorValue) {
 	case 0:
 		set(0, HIGH);
@@ -143,7 +154,36 @@ void OgamiHardware::selectorLed(){
 		set(1, LOW);
 		set(2, HIGH);
 		break;
+	}
+}
 
+void OgamiHardware::displayBPM(int bpm){
+	clockBPM = 0;
+	unsigned int quarterNote = 60000 / bpm;
+	if (clockBPM <= 3) {
+		set(0, HIGH);
+		set(1, LOW);
+		set(2, LOW);
+	}
+	if (clockBPM >= (quarterNote * 0.25)) {
+		set(0, LOW);
+		set(1, HIGH);
+		set(2, LOW);
+	}
+	if (clockBPM >= (quarterNote * 0.5)) {
+		set(0, LOW);
+		set(1, LOW);
+		set(2, HIGH);
+	}
+	if (clockBPM >= (quarterNote * 0.75)) {
+		set(0, LOW);
+		set(1, HIGH);
+		set(2, LOW);
+	}
+	if (clockBPM >= (quarterNote)) {
+		set(0, HIGH);
+		set(1, LOW);
+		set(2, LOW);
 	}
 }
 
@@ -168,6 +208,7 @@ void OgamiHardware::update() {
 		{
 			readAnalog(i);
 			readDigital(i);
+			makeArray(); //create a new array with all the inputs values
 			clockInputs = 0;
 			digitalWrite(5, HIGH && (i & B00000001));
 			digitalWrite(4, HIGH && (i & B00000010));
@@ -182,7 +223,7 @@ void OgamiHardware::readAnalog(byte i){
 	if(abs(potentiometersTemp[i] - potentiometersBuffer[i]) > _dbt) {
 		potentiometersBuffer[i] = potentiometersTemp[i];
 		potentiometers[i] = map(potentiometersTemp[i], minValue, maxValue, 127, 0);
-		potentiometers[i] = constrain(potentiometers[i], (unsigned int)0, (unsigned int)127);
+		potentiometers[i] = constrain(potentiometers[i], (byte)0, (byte)127);
 	}
 }
 
@@ -202,7 +243,7 @@ void OgamiHardware::readDigital(byte i){
 }
 
 void OgamiHardware::readMomentary(byte i){
-	bool momentary = buttonState[i];
+	byte momentary = buttonState[i];
 	switch (i) {
 	case 2:
 		if (momentary == LOW) {
@@ -215,7 +256,7 @@ void OgamiHardware::readMomentary(byte i){
 		}
 		break;
 	}
-	selectorValue = constrain(selectorValue, (unsigned int)0, (unsigned int)5);
+	selectorValue = constrain(selectorValue, (byte)0, (byte)5);
 }
 
 void OgamiHardware::toggleState(){
@@ -231,28 +272,34 @@ void OgamiHardware::toggleState(){
 	if (buttonState[0] == LOW) {toggles[2] = 0;}
 	else if (buttonState[7] == LOW) {toggles[2] = 127;}
 	else {toggles[2] = 64;}
-
 }
 
-int OgamiHardware::get(byte pin){
-	return potentiometers[pin];
+void OgamiHardware::makeArray() {
+	inputValues[0] = potentiometers[1];
+	inputValues[1] = potentiometers[2];
+	inputValues[2] = potentiometers[3];
+	inputValues[3] = potentiometers[4];
+	inputValues[4] = potentiometers[5];
+	inputValues[5] = potentiometers[6];
+	inputValues[6] = potentiometers[0];
+	inputValues[7] = toggles[0];
+	inputValues[8] = toggles[1];
+	inputValues[9] = toggles[2];
+}
+
+byte OgamiHardware::get(byte index){
+	return inputValues[index];
 }
 
 void OgamiHardware::debug() {
 	if (clockDebug > 300) {
-		Serial.println("Potentiometers:");
-		for (byte j = 0; j < maxInputs; j++) {
-			Serial.print(potentiometers[j]);
+		Serial.println("Inputs:");
+		for (byte j = 0; j < 10; j++) {
+			Serial.print(inputValues[j]);
 			Serial.print(" ");
 		}
 		Serial.println();
 
-		Serial.println("Toggles:");
-		for (byte j = 0; j < 3; j++) {
-			Serial.print(toggles[j]);
-			Serial.print(" ");
-		}
-		Serial.println();
 		Serial.println("selectorValue:");
 		Serial.print(selectorValue);
 		Serial.println();
