@@ -65,65 +65,10 @@ codec.enable();
 codec.enableIn();
 codec.enableOut();
 AudioNoInterrupts();
-//TEMPORARY, WILL BE REPLACED WITH A FOR LOOP ONCE EEPROM IS IMPLEMENTED
-bitcrusher.sampleRate(44100);
-bitcrusher.bits(16);
-
-waveshaper.shape(waveformsTable[0], 65);
-
-drive_mixer.gain(0, 0);
-drive_mixer.gain(1, 1);
 
 compressor.limit(-2.0f, 0.005f, 0.01f); //limit(threshold = -6.0f, attack = 0.005f, release = 0.01f)
 compressor.compression(-12.0f, 0.05f, 0.2f, 5.0f, 7.0f); //compression(threshold = -35.0f, attack = 0.005f, release = 0.2f, ratio = 45.0f, kneeWidth = 6.0f
 compressor.autoMakeupGain(6.0f);
-
-feedback_mixer.gain(0, 1);
-feedback_mixer.gain(1, 0);
-
-lowpass.frequency(15000);
-lowpass.resonance(0.7);
-lowpass.octaveControl(0);
-
-lowpassF.frequency(9000);
-lowpassF.resonance(0.7);
-lowpassF.octaveControl(0);
-
-highpass.frequency(30);
-highpass.resonance(0.7);
-highpass.octaveControl(0);
-
-highpassF.frequency(300);
-highpassF.resonance(0.7);
-highpassF.octaveControl(0);
-
-L_glitch_mixer.gain(0, 0.7);
-L_glitch_mixer.gain(1, 0.6);
-L_glitch_mixer.gain(2, 0.5);
-L_glitch_mixer.gain(3, 0);
-R_glitch_mixer.gain(0, 0.7);
-R_glitch_mixer.gain(1, 0.55);
-R_glitch_mixer.gain(2, 0.55);
-R_glitch_mixer.gain(3, 0);
-
-L_dry_wet_mixer.gain(0, 0);
-L_dry_wet_mixer.gain(1, 1);
-R_dry_wet_mixer.gain(0, 0);
-R_dry_wet_mixer.gain(1, 1);
-
-L_gain.gain(1);
-R_gain.gain(1);
-
-glitch.set_loop_size( 0, delay_time );
-glitch.set_loop_size( 1, delay_time );
-glitch.set_loop_size( 2, delay_time );
-glitch.set_loop_size( 3, delay_time );
-
-glitch.set_jitter( 0, 0.2 );
-glitch.set_jitter( 1, 0.2 );
-glitch.set_jitter( 2, 0.2 );
-glitch.set_jitter( 3, 0.2 );
-
 glitch.set_loop_moving(false);
 //MANUAL SETUP END
 AudioInterrupts();
