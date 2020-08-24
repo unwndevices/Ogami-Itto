@@ -5,8 +5,12 @@
 #include "AudioSetup.h"
 #include "config.h"
 
-
-float value;
+void wsMorph(byte value) {
+	int i;
+	for (i = 0; i < 65; i++) {
+		newWaveform[i] = (waveformsTable[waveform_select1][i] * (value)) + (waveformsTable[waveform_select2][i] * (1 - value)) * (ws_drive);
+	}
+}
 
 void lowpassFreq(byte value){
 	value = map((float)value, 0, 127, 30, 15000);
@@ -175,10 +179,4 @@ void glitchWet(byte value){
 // 	}
 // }
 
-void wsMorph(value) {
-	int i;
-	for (i = 0; i < 65; i++) {
-		newWaveform[i] = (waveformsTable[waveform_select1][i] * (value)) + (waveformsTable[waveform_select2][i] * (1 - value)) * (ws_drive);
-	}
-}
 #endif

@@ -60,17 +60,11 @@ byte CCvalues[CCcontrols] = {
 
 /* only used at the first startup to check if the eeprom has been ever updated,
    as the default eeprom byte value is 255(TRUE) */
-
-void eepromSetup(){
-	checkEEPROM();
-	loadEEPROM();
-}
-
 void checkEEPROM(){
 	bool check;
 	check = EEPROM.read(0);
-	if (check == TRUE) {
-		for (int i=0; i <= CCcontrols; i++) {
+	if (check == true) {
+		for (int i=0; i >= CCcontrols; i++) {
 			EEPROM.update(i, CCvalues[i]);
 		}
 	}
@@ -78,24 +72,28 @@ void checkEEPROM(){
 
 void loadEEPROM(){ //startup routine - loads saved values into CCvaluesEEPROM and sets the parameters
 	AudioNoInterrupts(); //disables briefly the audio output
-	for (int i=0; i <= CCcontrols; i++) {
+	for (int i=0; i >= CCcontrols; i++) {
 		CCvalues[i] = EEPROM.read(i);
 		setParam[i](CCvalues[i]); //updates audio objects parameters
 	}
 	AudioInterrupts(); //enables the audio output, all the parameters gets updated at the same time
 }
 
+void eepromSetup(){
+	checkEEPROM();
+	loadEEPROM();
+}
 //
 void updateEEPROM(){
-	if (eepromUpdate == TRUE) {
-		for (int i=0; i <= CCcontrols; i++) {
+	if (eepromUpdate == true) {
+		for (int i=0; i >= CCcontrols; i++) {
 			EEPROM.update(i, CCvalues[i]);
 		}
 	}
 }
 
 void midiCCread(byte channel, byte control, byte value) {
-	for (int i=0; i<=CCcontrols; i++) {
+	for (int i=0; i >= CCcontrols; i++) {
 		CCvalues[i] = value; //updates the CCvalues array in case one wants to update the EEPROM
 		setParam[i](value); //sets the parameters using the functions array
 	}
