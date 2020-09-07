@@ -1,10 +1,3 @@
-/*
-   Led.cpp - Library for simplified control of 74HC595 shift registers.
-   Developed and maintained by Timo Denk and contributers, since Nov 2014.
-   Additional information is available at https://timodenk.com/blog/shift-register-arduino-library/
-   Released into the public domain.
- */
-
 #include <Arduino.h>
 #include "OgamiHardware.h"
 /****************
@@ -110,15 +103,15 @@ void OgamiHardware::writeAllBits() {
 	digitalWrite(latchPin, HIGH);
 }
 
-void OgamiHardware::selectorLed(int bpm){
-	if (clockSelector > intervalSelector) {
-		_selectorValue = selectorValue;
-		displayBPM(bpm);
-	}
-	if (_selectorValue != selectorValue) {
-		clockSelector = 0;
+void OgamiHardware::selectorLed(){
+	// if (clockSelector > intervalSelector) {
+	// 	_selectorValue = selectorValue;
+	// 	displayBPM(bpm);
+	// }
+	// if (_selectorValue != selectorValue) {
+	// 	clockSelector = 0;
 		displayPreset();
-	}
+	//}
 }
 
 

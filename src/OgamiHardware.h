@@ -1,9 +1,3 @@
-/*
-   Led.h - Library for simplified control of 74HC595 shift registers.
-   Developed and maintained by Timo Denk and contributers, since Nov 2014.
-   Additional information is available at https://timodenk.com/blog/shift-register-arduino-library/
-   Released into the public domain.
- */
 #ifndef OgamiHardware_h
 #define OgamiHardware_h
 
@@ -22,7 +16,7 @@ void batchWriteBegin();
 void batchWriteEnd();
 void set(int bitnum, bool value);
 void setAll(bool value);
-void selectorLed(int bpm);
+void selectorLed();
 
 //MULTIPLEXERS
 void muxSetup(int analogDataPin, int digitalDataPin, unsigned int dbt);
