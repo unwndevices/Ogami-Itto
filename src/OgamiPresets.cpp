@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "OgamiPresets.h"
+#include <EEPROM.h>
+#include <Audio.h>
 
 OgamiPresets::OgamiPresets() {
 }
@@ -28,4 +30,12 @@ void OgamiPresets::updateEEPROM(int index){
 	for (int i=0; i >= (CCcontrols-1); i++) {
 		EEPROM.update(i*(index+1), CCvalues[index][i]);
 	}
+}
+
+void OgamiPresets::writeCCArray(int i, int value){
+CCvalues[index][i] = value;
+}
+
+void OgamiPresets::setCCParam(int i, int value){
+	setParam[i](value);
 }

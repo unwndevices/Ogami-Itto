@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 #include "functions.h"
-#include <EEPROM.h>
-#include <Audio.h>
 
 class OgamiPresets {
 
@@ -13,6 +11,8 @@ OgamiPresets();
 void loadEEPROM(int index);
 void init(int presets, int CCcontrols);
 void updateEEPROM(int index);
+void writeCCArray (int i, int value);
+void setCCParam (int i, int value);
 
 byte CCvalues[3][36]{};
 typedef void (*paramFunction) (byte value);
@@ -39,6 +39,7 @@ paramFunction setParam[36]{
 	glitchHead4,
 	glitchWet
 };
+
 int presets;
 int index;
 
