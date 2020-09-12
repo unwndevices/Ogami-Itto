@@ -25,9 +25,13 @@ void midiSetup() {
 }
 
 void setup() {
-	midiSetup();
+	// usbMIDI.setHandleControlChange(midiCCread);
+	// usbMIDI.setHandleClock(clockMidi); //MIDI SYNC
+	// usbMIDI.setHandleStart(clockStart);
+	// usbMIDI.setHandleContinue(clockContinue);
+	// usbMIDI.setHandleStop(clockStop);
 	audioSetup();
-	presets.init(3, 36);
+	presets.init(3, CCcontrols);
 	presets.loadEEPROM(0); // preset 1 (index 0) gets loaded from eeprom
 	ogami.ledSetup(9, 10, 11); //LED BitShifter setup (data, clock, latch)
 	ogami.muxSetup(A8, 1, 4); //Mux setup (Analog, Digital, deadband)
@@ -40,3 +44,10 @@ void loop() {
 	// ogami.debug();
 
 }
+
+// void midiCCread(byte channel, byte control, byte value) {
+// 	for (int i=0; i >= (CCcontrols-1); i++) {
+// 		EepromVal.CCvalues[EepromVal.index][i] = value;         //updates the CCvalues array in case one wants to update the EEPROM
+// 		EepromVal.setParam[i](value);         //sets the parameters using the functions array
+// 	}
+// }
