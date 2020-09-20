@@ -39,6 +39,11 @@ bool batchWriteMode;
 bool batchReadMode;
 byte selectorValue = 0;
 byte _selectorValue;
+// long/short presses
+elapsedMillis holdTime;
+const int shortPressTime = 480;
+
+
 const unsigned int intervalSelector = 1000;
 elapsedMillis clockSelector;
 elapsedMillis clockBPM;
@@ -69,21 +74,40 @@ const unsigned int intervalInputs = 100;
 elapsedMicros clockDebounce;
 unsigned long lastDebounce = 0;
 const unsigned long debounceDelay = 300;
-byte buttonState[8] {LOW};
-byte buttonStateTemp[8] {LOW};
-byte buttonStateLast[8] {LOW};
+byte buttonState[8] {HIGH};
+byte buttonStateTemp[8] {HIGH};
+byte buttonStateLast[8] {HIGH};
 byte toggles[3] {0};
 elapsedMillis clockDebug;
 
+//long press
+elapsedMillis pressTimer;
+unsigned long longPress = 500;
+bool isArcadePressed = false;
+bool momentaryChanged = false;
+
+//aux
+const int arcadePin = 14;
+const int expressionPin = 15;
+byte arcadeState = HIGH;
+byte arcadeStateTemp = HIGH;
+byte arcadeStateLast = HIGH;
+byte expressionValue = 0;
+byte expressionValueTemp;
+byte expressionValueBuffer;
+
 //get array
-byte inputValues[10] {0}; // 7 potentiometers + 3 switches
+byte inputValues[13] {0}; // 7 pots + 3 switches + selector + arcade + exp
 void makeArray();
 
 void readAnalog(byte i);
 void readDigital(byte i);
+void readAux();
 void readMomentary(byte i);
 void toggleState();
 
 };
+
+extern OgamiHardware State;
 
 #endif

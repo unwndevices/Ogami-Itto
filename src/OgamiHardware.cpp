@@ -110,7 +110,7 @@ void OgamiHardware::selectorLed(){
 	// }
 	// if (_selectorValue != selectorValue) {
 	// 	clockSelector = 0;
-		displayPreset();
+	displayPreset();
 	//}
 }
 
@@ -192,6 +192,8 @@ void OgamiHardware::muxSetup(int analogDataPin, int digitalDataPin, unsigned int
 	pinMode(2, OUTPUT);
 	pinMode(analogDataPin, INPUT);
 	pinMode(digitalDataPin, INPUT_PULLUP);
+	pinMode(arcadePin, INPUT_PULLUP); //arcade button
+	pinMode(expressionPin, INPUT_PULLUP); // exp pedal
 	analogReadResolution(10);
 }
 
@@ -201,6 +203,7 @@ void OgamiHardware::update() {
 		{
 			readAnalog(i);
 			readDigital(i);
+			readAux();
 			makeArray(); //create a new array with all the inputs values
 			clockInputs = 0;
 			digitalWrite(5, HIGH && (i & B00000001));
@@ -213,7 +216,7 @@ void OgamiHardware::update() {
 
 void OgamiHardware::readAnalog(byte i){
 	potentiometersTemp[i] = analogRead(_analogDataPin);
-	if(abs(potentiometersTemp[i] - potentiometersBuffer[i]) > _dbt) {
+	if (abs(potentiometersTemp[i] - potentiometersBuffer[i]) > _dbt) {
 		potentiometersBuffer[i] = potentiometersTemp[i];
 		potentiometers[i] = map(potentiometersTemp[i], minValue, maxValue, 127, 0);
 		potentiometers[i] = constrain(potentiometers[i], (byte)0, (byte)127);
@@ -235,21 +238,62 @@ void OgamiHardware::readDigital(byte i){
 	buttonStateLast[i] = buttonStateTemp[i];
 }
 
+void OgamiHardware::readAux(){
+	//read arcade
+	arcadeStateTemp = digitalRead(arcadePin);
+	if (arcadeStateTemp != arcadeStateLast) {
+		clockDebounce = 0;
+	}
+	if (clockDebounce > debounceDelay) {
+		if (arcadeStateTemp != arcadeState) {
+			arcadeState = map(arcadeStateTemp, 0, 1, 0, 127);
+		}
+	}
+	//read expression pedal
+	expressionValueTemp = analogRead(expressionPin);
+	if (abs(expressionValueTemp - expressionValueBuffer) > _dbt) {
+		expressionValueBuffer = expressionValueTemp;
+		expressionValue = map(expressionValueTemp, minValue, maxValue, 0, 127);
+		expressionValue = constrain(expressionValue, (byte)0, (byte)127);
+	}
+}
+
 void OgamiHardware::readMomentary(byte i){
 	byte momentary = buttonState[i];
 	switch (i) {
-	case 2:
-		if (momentary == LOW) {
+	case 2: //left momentary
+		if (momentary == LOW ) {
+			pressTimer = 0; //timer starts
+			momentaryChanged = true;
+			if (arcadeState == LOW) {
+				isArcadePressed = true;
+			}
+		}
+		if (momentary == HIGH && momentaryChanged == true && (pressTimer > longPress)) {
 			selectorValue--;
+			momentaryChanged = false;
+		}
+		if (momentary == HIGH && isArcadePressed == true && (pressTimer < longPress)) {
+			//ADD EEPROM SAVE ROUTINE
+			momentaryChanged = false;
+			isArcadePressed = false;
 		}
 		break;
 	case 1:
-		if (momentary == LOW) {
+		if (momentary == LOW ) {
+			pressTimer = 0; //timer starts
+			momentaryChanged = true;
+			if (arcadeState == LOW) {
+				isArcadePressed = true;
+			}
+		}
+		if (momentary == HIGH && momentaryChanged == true && (pressTimer > longPress)) {
 			selectorValue++;
+			momentaryChanged = false;
 		}
 		break;
 	}
-	selectorValue = constrain(selectorValue, (byte)0, (byte)5);
+	selectorValue = constrain(selectorValue, (byte)0, (byte)4);
 }
 
 void OgamiHardware::toggleState(){
@@ -278,6 +322,9 @@ void OgamiHardware::makeArray() {
 	inputValues[7] = toggles[0];
 	inputValues[8] = toggles[1];
 	inputValues[9] = toggles[2];
+	inputValues[10] = arcadeState;
+	inputValues[11] = expressionValue;
+	inputValues[12] = selectorValue;
 }
 
 byte OgamiHardware::get(byte index){
@@ -287,14 +334,10 @@ byte OgamiHardware::get(byte index){
 void OgamiHardware::debug() {
 	if (clockDebug > 300) {
 		Serial.println("Inputs:");
-		for (byte j = 0; j < 10; j++) {
+		for (byte j = 0; j < 13; j++) {
 			Serial.print(inputValues[j]);
 			Serial.print(" ");
 		}
-		Serial.println();
-
-		Serial.println("selectorValue:");
-		Serial.print(selectorValue);
 		Serial.println();
 		clockDebug = 0;
 	}

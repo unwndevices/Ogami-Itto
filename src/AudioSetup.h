@@ -64,8 +64,9 @@ AudioMemory(16);
 codec.enable();
 codec.enableIn();
 codec.enableOut();
+in.begin();
+out.begin();
 AudioNoInterrupts();
-
 compressor.limit(-2.0f, 0.005f, 0.01f); //limit(threshold = -6.0f, attack = 0.005f, release = 0.01f)
 compressor.compression(-12.0f, 0.05f, 0.2f, 5.0f, 7.0f); //compression(threshold = -35.0f, attack = 0.005f, release = 0.2f, ratio = 45.0f, kneeWidth = 6.0f
 compressor.autoMakeupGain(6.0f);
